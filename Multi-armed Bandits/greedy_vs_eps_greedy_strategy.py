@@ -9,8 +9,8 @@ k = 10 # number of arms
 num_steps = 1000
 
 # Reality Model
-reward_mean = np.random.normal(0, 2, k)
-reward_variance = 0.5 + np.random.rand(10)/30
+reward_mean = np.random.normal(0, 1, k)
+reward_variance = np.random.rand(10)
 print(reward_mean)
 print(reward_variance)
 # Initialization
@@ -29,13 +29,14 @@ for n in range(num_steps):
     Q[action] = Q[action] + 1/N[action] * (reward_observed - Q[action])
 
 print("Greedy")
+print("action selected:")
 print(N)
-print(np.average(reward_greedy))
+print(f"Average Reward {np.average(reward_greedy):.3f}")
 print("")
 
 
 
-# Epsilon-Greedy: epsilon = 0.1
+# Epsilon-Greedy
 epsilon = 0.1
 
 # Initialization
@@ -55,8 +56,9 @@ for n in range(num_steps):
     Q[action] = Q[action] + 1/N[action] * (reward_observed - Q[action])
 
 print("Epsilon_greedy")
+print("action selected:")
 print(N)
-print(np.average(reward_epsilon_greedy))
+print(f"Average Reward {np.average(reward_epsilon_greedy):.3f}")
 print("")
 
 
