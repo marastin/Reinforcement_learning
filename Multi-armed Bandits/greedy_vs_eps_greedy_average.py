@@ -11,7 +11,7 @@ reps = 400
 
 # Reality Model
 reward_mean = np.random.normal(0, 1, k)
-reward_variance = np.random.rand(10)
+reward_variance = np.random.rand(k)
 print(reward_mean)
 print(reward_variance)
 
@@ -89,6 +89,6 @@ plt.plot(np.average(reward_epsilon_greedy2,axis=1), label='Epsilon Greedy - 0.01
 plt.xlabel('Steps')
 plt.ylabel('Reward')
 plt.legend()
-plt.title('Greedy vs Epsilon Greedy Strategy in k-Armed Bandit')
+plt.title(r'Greedy vs $\epsilon$-Greedy Strategy in k-Armed Bandit')
 plt.show()
 

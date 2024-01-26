@@ -10,7 +10,7 @@ num_steps = 1000
 
 # Reality Model
 reward_mean = np.random.normal(0, 1, k)
-reward_variance = np.random.rand(10)
+reward_variance = np.random.rand(k)
 print(reward_mean)
 print(reward_variance)
 # Initialization
@@ -68,6 +68,6 @@ plt.plot(reward_epsilon_greedy, label='Epsilon Greedy' )
 plt.xlabel('Steps')
 plt.ylabel('Reward')
 plt.legend()
-plt.title('Greedy vs Epsilon Greedy Strategy in k-Armed Bandit')
+plt.title(r'Greedy vs $\epsilon$-Greedy Strategy in k-Armed Bandit')
 plt.show()
 
