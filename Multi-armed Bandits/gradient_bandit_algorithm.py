@@ -1,4 +1,10 @@
-# Gradient Bandit Algorithms
+# Gradient Bandit Algorithm with Changing Action Values
+
+# This code implements a gradient bandit algorithm to solve a k-armed bandit problem
+# where the action values change over time. The algorithm uses a softmax policy to
+# select actions based on estimated action values. The action values are updated using
+# a gradient update rule, and the rewards are generated from a changing distribution.
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,20 +23,21 @@ def choose_action(probabilities):
 np.random.seed(31) # Set a seed for reproducibility
 k = 10 # number of arms
 num_steps = 1000
-reps = 200
+reps = 1
+action_value_is_changing = True
 
 # Reality Model
 reward_mean = np.random.normal(4, 1, k) # mean = 4, var = 1, size = k
 reward_variance = np.random.rand(k)
 
 reward_mean_change = np.zeros([1, k])
-reward_variance_change = np.ones([1, k])*0.01
+reward_variance_change = np.ones([1, k])*0.05
 
 reward = np.zeros([k, num_steps])
 
 reward[:,0] = np.random.normal(reward_mean[:], reward_variance[:])
 for n in range(1, num_steps):
-    reward[:,n] = reward[:, n - 1] + 0 * np.random.normal(reward_mean_change[:], reward_variance_change[:])
+    reward[:,n] = reward[:, n - 1] + np.random.normal(reward_mean_change[:], reward_variance_change[:]) * action_value_is_changing
 
 
 
@@ -66,7 +73,7 @@ for rep in range(reps):
 
 # Plots
 
-plt.plot(np.average(reward_gradient,axis=1), label=r'gradient bandit - $\alpha$ = 0.1' )
+plt.plot(np.average(reward_gradient,axis=1), 'o', label=r'gradient bandit - $\alpha$ = 0.1' )
 plt.xlabel('Steps')
 plt.ylabel('Reward')
 plt.legend()

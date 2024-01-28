@@ -1,4 +1,10 @@
-# k-armed bandit Problem
+# k-Armed Bandit Problem - UCB vs Epsilon-Greedy
+
+# This code compares the performance of two strategies, Upper Confidence Bound (UCB)
+# and epsilon-greedy, in a k-armed bandit problem. The k-armed bandit is a classical
+# reinforcement learning problem where an agent needs to choose between k different
+# actions, each associated with an unknown reward. The goal is to learn the optimal
+# action to maximize cumulative reward.
 
 import numpy as np
 import matplotlib.pyplot as plt
