@@ -1,4 +1,5 @@
 % Grid world 4x4
+% Example 4.1 Book
 
 clear
 clc
