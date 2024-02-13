@@ -3,9 +3,9 @@
 clear
 clc
 close all
-rng(31)
+max_iter = 1000000;
 
-states = zeros([10, 10, 2]); % Player Sum (11-21) - Dealer Showing (A-10) - Usable Ace (Yes-No)
+states = zeros([10, 10, 2]); % Player Sum (11-21) - Dealer Showing (A-10) - Usable Ace (false:1 - true:2)
 actions = [1, 2]; % Hit - Stick
 Deck = [1:10, 10, 10, 10]; % numbers - jack - queen - king
 Bust = 21;
@@ -22,7 +22,7 @@ s_size = size(states_actions);
 a_size = numel(actions);
 
 iter = 0;
-while iter < 100000
+while iter < max_iter
     state = gen_random_state(s_size); % 11:21
     action = gen_random_action(a_size); % 1:2
 
@@ -30,6 +30,7 @@ while iter < 100000
     player_turn = true;
     player_bust = false;
     player_natural = false;
+    player_usable_ace = (state(3) == 2);
     visited_state_action = {[state, action]};
 
     while player_turn
@@ -37,8 +38,14 @@ while iter < 100000
             new_card = get_new_card(Deck);
             state(1) = state(1) + new_card;
             if state(1) > Bust
-                player_bust = true;
-                player_turn = false;
+                if player_usable_ace
+                    state(1) = state(1) - 10;
+                    state(3) = 1;
+                    player_usable_ace = false;
+                else
+                    player_bust = true;
+                    player_turn = false;
+                end
             elseif state(1) == Bust
                 player_natural = true;
                 player_turn = false;
@@ -47,7 +54,7 @@ while iter < 100000
             player_turn = false;
         end
         if (player_bust == false) && (player_natural == false)
-            visited_state_action{end+1} = [state, action];
+            visited_state_action{end+1} = [state, action]; % Change in size happens a few time until the end of episode
         end
         if player_turn
             action = get_policy(state, Q);
@@ -58,15 +65,21 @@ while iter < 100000
     dealer_turn = true;
     dealer_bust = false;
     dealer_sum = state(2); % The shown card add to sum. later the other cards will be added
+    dealer_usable_ace = (state(2) == 1); % Dealer shown card is Ace so that it can be considered as usable
     while dealer_turn
         new_card = get_new_card(Deck);
         dealer_sum = dealer_sum + new_card; % Other cards added to sum here
-        if dealer_sum > Dealer_limit % Dealer Stick
+        if dealer_sum >= Dealer_limit % Dealer Stick
             dealer_turn = false;
         end
         if dealer_sum > Bust % Dealer Bust
-            dealer_bust = true;
-            dealer_turn = false;
+            if dealer_usable_ace
+                dealer_sum = dealer_sum - 10;
+                dealer_usable_ace = false;
+            else
+                dealer_bust = true;
+                dealer_turn = false;
+            end
         end
     end
 
@@ -99,36 +112,65 @@ while iter < 100000
 end
 
 
-% Plotting Q
-for c = 1:2
-    for a = 1:2
-        subplot(2, 2, (c-1)*2+a);
-        imagesc(squeeze(Q(:, :, c, a)));
-        colorbar;
-        title(sprintf('Action %d, C = %d', a, c));
-        xlabel('player sum');
-        ylabel('dealer showing');
-    end
-end
+[V, greedy_actions] = max(Q, [], 4);
 
-% Plotting Policy
-figure
-% Compute greedy actions
-[~, greedy_actions] = max(Q, [], 4);
-for c = 1:2
-    for a = 1:2
-        subplot(2, 2, (c-1)*2+a);
-        imagesc(greedy_actions(:, :, c));
-        colorbar;
-        title(sprintf('Greedy Action for C = %d, Action %d', c, a));
-        xlabel('A');
-        ylabel('B');
-    end
-end
+% Plotting
+figure('Units', 'normalized', 'OuterPosition', [0 0 1 1]); % Maximize the figure
+defaultColormap = colormap;
+
+subplot(2,2,1)
+imagesc(greedy_actions(:, :, 1));
+title('Action - No Usable Ace')
+xlabel('Dealer Shown')
+ylabel('Player Sum')
+xticks(1:10);
+yticks(1:10);
+yticklabels(11:20);
+axis equal;
+colormap(gca, [1 1 0; 0 0 1]) % Yellow for values <= 1.5, Blue for values > 1.5
+c = colorbar;
+c.Ticks = [1 2]; % Set tick locations
+c.TickLabels = {'Hit', 'Stick'}; % Set tick labels
+c.Limits = [0.5 2.5];
 
 
 
+subplot(2,2,2)
+imagesc(greedy_actions(:, :, 2));
+title('Action - Usable Ace')
+xlabel('Dealer Shown')
+ylabel('Player Sum')
+xticks(1:10);
+yticks(1:10);
+yticklabels(11:20);
+axis equal;
+colormap(gca, [1 1 0; 0 0 1]) % Yellow for values <= 1.5, Blue for values > 1.5
+c = colorbar;
+c.Ticks = [1 2]; % Set tick locations
+c.TickLabels = {'Hit', 'Stick'}; % Set tick labels
+c.Limits = [0.5 2.5];
 
+subplot(2,2,3)
+[X, Y] = meshgrid(1:10, 1:10);
+surf(X, Y, V(:, :, 1));
+title('No Usable Ace')
+xlabel('Dealer Shown')
+ylabel('Player Sum')
+zlabel('State Value')
+xticks(1:10);
+yticks(1:10);
+yticklabels(11:20);
+
+subplot(2,2,4)
+[X, Y] = meshgrid(1:10, 1:10);
+surf(X, Y, V(:, :, 2));
+title('Usable Ace')
+xlabel('Dealer Shown')
+ylabel('Player Sum')
+zlabel('State Value')
+xticks(1:10);
+yticks(1:10);
+yticklabels(11:20);
 
 
 function state = gen_random_state(states_size)
