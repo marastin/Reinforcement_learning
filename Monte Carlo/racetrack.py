@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 Reward = -1
 Gamma = 1
-n_episodes = 10000
+n_episodes = 100000
 noise_prob = 0.1
 
 # number of race track rows and columns
@@ -69,7 +69,7 @@ for r in range(rows):
 
 
 S = np.empty(10**6, dtype=tuple) # memory for state
-B = np.empty(10**6, dtype=int)   # memory for selected actions by behaviour policy
+A = np.empty(10**6, dtype=int)   # memory for selected actions by behaviour policy
 P = np.empty(10**6, dtype=float) # memory for selected actions probabilities
 
 def generate_episode(epsilon=0.1, noise=True):
@@ -100,7 +100,7 @@ def generate_episode(epsilon=0.1, noise=True):
             prob = noise_prob
 
 
-        B[t] = behavior
+        A[t] = behavior
         P[t] = prob
         act_b = actions[behavior]
         
@@ -126,7 +126,7 @@ def update_policy(T):
     
     for t in range(T-1, -1, -1):
         s = S[t]
-        a = B[t]
+        a = A[t]
         sa = (*s, a)
 
         G = Reward + Gamma*G
@@ -143,14 +143,24 @@ def update_policy(T):
         W /= P[t]
 
 
+def make_sample(n=1):
+    for i in range(n):
+        T = generate_episode(epsilon=0, noise=0)
+        for t in range(T):
+            print(f"S: {S[t]}", end=' ')
+            print(f" -> A: {actions[A[t]]}", end="\n")
+        print(f"Reward = {-T}")
+
+
 def main():
     for i in range(n_episodes):
         T = generate_episode(epsilon=0.1)
         update_policy(T)    
         R[i] = Reward*T
-        if (i+1) % 10 == 0:
-            print(f"episode {i}: {R[i]}")
-        
+        if (i+1) % 100 == 0:
+            print(f"episode {i+1} / {n_episodes}: {R[i]}")
+
+    make_sample(2)
     
     plt.plot(R)
     plt.title("Reward")
@@ -164,125 +174,6 @@ def main():
 
 
 
+
 if __name__ == "__main__":
     main()
-
-
-
-
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''
-n_episodes = 100
-epsilon = 0.1
-
-for episode in range(n_episodes):
-    t = 0
-    state[t] = (0, random.choice(start_line), 0, 0) # dir_1, dir_2, v_dir_1, v_dir_2
-
-    while True:
-        s = state[t]
-        possible_act_1 = possible_actions_1[s[2]]
-        possible_act_2 = possible_actions_2[s[3]]
-
-        if random.random() < epsilon:
-            act_1 = random.choice(possible_act_1)
-            act_2 = random.choice(possible_act_2)
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-ε = 0.1
-gamma = 1
-actions = [
-    (0, 0),
-    (0, 1),
-    (0, -1),
-    (1, 0),
-    (1, 1),
-    (1, -1),
-    (-1, 0),
-    (-1, 1),
-    (-1, -1),
-]
-act_len = len(actions)
-
-# 5 velocity values 0 to 4, represented by 1 to 5
-vel_len = 5
-
-# initialise Q, C and π
-# state is 4-tuple: (row, col, velocity_horizontal, velocity_vertical)
-Q = np.random.rand(rows, cols, vel_len, vel_len, act_len) * 400 - 500
-C = np.zeros((rows, cols, vel_len, vel_len, act_len))
-π = np.ones((rows, cols, vel_len, vel_len), dtype=int)
-for r in range(rows):
-    for c in range(cols):
-        for h in range(vel_len):
-            for v in range(vel_len):
-                π[r, c, h, v] = np.argmax(Q[r, c, h, v, :])
-
-
-
-# set up the 1st race track map, origin (1,1) is at the bottom left,
-# boundaries are marked with 1
-track = np.zeros((rows, cols), dtype=int)
-track[31:32, 0:3] = 1
-track[30:31, 0:2] = 1
-track[29:30, 0:2] = 1
-track[28:29, 0:1] = 1
-track[0:18, 0:1] = 1
-track[0:10, 1:2] = 1
-track[0:3, 2:3] = 1
-track[0:26, 9:16] = 1
-track[25:26, 9:10] = 0
-start_cols = list(range(3, 9))  # start line columns
-fin_cells = set([
-    (26, cols),
-    (27, cols),
-    (28, cols),
-    (29, cols),
-    (30, cols),
-    (31, cols),
-])  # finish cells
-
-# plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
-# plt.imshow(track, cmap='tab10', aspect='equal')
-# plt.show()
-
-valid_acts = [
-    [a[0] for a in enumerate(actions) if (h + a[1][0] in range(5)) and (v + a[1][1] in range(5)) and not((h + a[1][0]) == 0 and (v + a[1][1]) == 0)]
-    for h in range(vel_len) for v in range(vel_len)
-]
-print(valid_acts)
-print(len(valid_acts))
-
-# pre-allocated state, action, probability trajectory array
-S = np.empty(10**6, dtype=tuple)
-A = np.empty(10**6, dtype=int)
-B = np.empty(10**6, dtype=float)
-'''
