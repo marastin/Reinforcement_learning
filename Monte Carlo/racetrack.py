@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 Reward = -1
 Gamma = 1
 n_episodes = 10000
-
+noise_prob = 0.1
 
 # number of race track rows and columns
 margin = 5
@@ -72,7 +72,7 @@ S = np.empty(10**6, dtype=tuple) # memory for state
 B = np.empty(10**6, dtype=int)   # memory for selected actions by behaviour policy
 P = np.empty(10**6, dtype=float) # memory for selected actions probabilities
 
-def generate_episode(epsilon = 0.1):
+def generate_episode(epsilon=0.1, noise=True):
     t = 0
     S[0] = (0, random.choice(start_line), 0, 0)
     
@@ -95,6 +95,11 @@ def generate_episode(epsilon = 0.1):
             behavior = random.choice(possible_actions)
             prob = (epsilon if a_policy_is_valid else 1) / n_possible_actions
         
+        if noise and random.random() < noise_prob:
+            behavior = 0
+            prob = noise_prob
+
+
         B[t] = behavior
         P[t] = prob
         act_b = actions[behavior]
@@ -148,11 +153,13 @@ def main():
         
     
     plt.plot(R)
+    plt.title("Reward")
     plt.show()
 
     plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
     plt.imshow(Track_visited, aspect='equal')
-    plt.colorbar()  
+    plt.colorbar()
+    plt.title("Track Visited show as 1")
     plt.show()
 
 
