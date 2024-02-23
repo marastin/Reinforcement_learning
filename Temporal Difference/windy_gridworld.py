@@ -1,4 +1,6 @@
 import numpy as np
+from tabulate import tabulate
+np.random.seed(31)
 
 # Problem Parameters
 n_rows = 7
@@ -30,14 +32,15 @@ for row in range(n_rows):
     for col in range(n_cols):
         transition = []
         if row > 0:
-            transition.append(0) # Move Down (N)
+            transition.append(0) # Move Up (N)
         if row < n_rows - 1:
-            transition.append(1) # Move Up (S)
+            transition.append(1) # Move Down (S)
         if col > 0:
-            transition.append(3) # Move Right (W)
+            transition.append(3) # Move Left (W)
         if col < n_cols - 1:
-            transition.append(2) # Move Left (E)
+            transition.append(2) # Move Right (E)
         transitions[row, col] = transition
+print(tabulate(transitions, tablefmt='fancy_grid'))
 
 # Define transition duo to the wind
 wind = np.empty((n_rows, n_cols, 2))
@@ -51,7 +54,7 @@ for row in range(n_rows):
             wind[row, col, :] = np.array((0, 0))
 
 # Define the number of episodes
-num_episodes = 10000
+num_episodes = 50
 time_elapsed_in_episode = np.zeros((num_episodes, 1), dtype=int)
 
 # Initialize state-action values
@@ -115,5 +118,61 @@ for episode in range(num_episodes):
         selected_action = next_action
 
         t += 1
+    
+    # Record the number of step
+    time_elapsed_in_episode[episode] = t
+
     if (episode + 1) % 100 == 0:
         print(f"episode {episode + 1}: T = {t}")
+
+# Draw a table to visualize the greedy action based on the argmax of Q
+greedy_actions = np.empty((n_rows, n_cols), dtype=object)
+for row in range(n_rows):
+    for col in range(n_cols):
+        state = (row, col)
+        greedy_action = transitions[*state][np.argmax(Q[*state][transitions[*state]])]
+        if greedy_action == 0:
+            greedy_actions[row, col] = 'N'
+        elif greedy_action == 1:
+            greedy_actions[row, col] = 'S'
+        elif greedy_action == 2:
+            greedy_actions[row, col] = 'E'
+        elif greedy_action == 3:
+            greedy_actions[row, col] = 'W'
+
+print(tabulate(greedy_actions, tablefmt='fancy_grid'))
+
+# Create a greedy episode
+state = start_point
+selected_action = transitions[*state][np.argmax(Q[*state][transitions[*state]])]
+greedy_actions_steps = np.empty((n_rows, n_cols), dtype=object)
+
+t = 0
+greedy_actions_steps[*state] = t
+while True:
+
+    # Check being at terminal state
+    if all(state == terminal_state):
+        break
+    
+    next_state = state + actions[selected_action] + wind[*state]
+    
+    # Addjust the state so that the agent remains inside the gridworld
+    next_state = np.array((min(n_rows - 1, max(0, next_state[0])), min(n_cols -1, max(0, next_state[1]))), dtype=int)
+
+    # Considering constant reward -1
+    reward = rewards
+
+    # Select the greedy action
+    next_action = transitions[*state][np.argmax(Q[*state][transitions[*state]])]
+
+    # Update state and action for next loop
+    state = next_state
+    selected_action = next_action
+
+    t += 1
+    greedy_actions_steps[*state] = t
+    if t > 100:
+        break
+
+print(tabulate(greedy_actions_steps, tablefmt='fancy_grid'))
