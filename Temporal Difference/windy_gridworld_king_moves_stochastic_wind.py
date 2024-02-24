@@ -1,3 +1,19 @@
+"""
+This code implements the SARSA (State-Action-Reward-State-Action) algorithm to solve a grid world problem with windy conditions.
+SARSA is an on-policy temporal-difference reinforcement learning algorithm that learns the optimal policy.
+
+The grid world consists of a specified number of rows and columns, with a start point and a terminal state.
+
+The agent can move in eight directions (N, S, E, W, NE, SE, NW, SW) with stochastic wind effects in certain columns.
+
+Assuming that the effect of the wind, if there is any, is stochastic, sometimes varying by 1 from the mean values given
+for each column. That is, a third of the time you move exactly according to these values, as in the previous exercise, 
+but also a third of the time you move one cell above that, and another third of the time you move one cell below that.
+
+The goal is to learn the optimal policy that maximizes cumulative rewards while navigating from the start point to the terminal state.
+
+"""
+
 import numpy as np
 from tabulate import tabulate
 import matplotlib.pyplot as plt
@@ -114,7 +130,7 @@ for episode in range(num_episodes):
         if all(wind[*state] == np.array([0, 0])):
             stochastic_wind = wind[*state]
         else:
-            stochastic_wind = wind[*state] + [np.random.choice([-1, 1]), 0]
+            stochastic_wind = wind[*state] + [np.random.choice([-1, 0, 1]), 0]
         
         # Calculating next state
         next_state = state + actions[selected_action] + stochastic_wind

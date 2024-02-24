@@ -1,3 +1,15 @@
+"""
+This code implements the SARSA (State-Action-Reward-State-Action) algorithm to solve a grid world problem with windy conditions.
+SARSA is an on-policy temporal-difference reinforcement learning algorithm that learns the optimal policy.
+
+The grid world consists of a specified number of rows and columns, with a start point and a terminal state.
+
+The agent can move in four directions (N, S, E, W) with wind effects in certain columns.
+
+The goal is to learn the optimal policy that maximizes cumulative rewards while navigating from the start point to the terminal state.
+
+"""
+
 import numpy as np
 from tabulate import tabulate
 import matplotlib.pyplot as plt
