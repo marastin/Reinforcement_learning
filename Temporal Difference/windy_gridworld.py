@@ -98,7 +98,7 @@ for episode in range(num_episodes):
         if all(state == terminal_state):
             break
         
-        next_state = state + actions[selected_action] + wind[*state] # TODO
+        next_state = state + actions[selected_action] + wind[*state]
         
         # Addjust the state so that the agent remains inside the gridworld
         next_state = np.array((min(n_rows - 1, max(0, next_state[0])), min(n_cols -1, max(0, next_state[1]))), dtype=int)
@@ -116,7 +116,7 @@ for episode in range(num_episodes):
 
                 
         # Update action-state value
-        Q[*state][selected_action] += alpha * (reward + gamma * Q[*next_state][next_action] - Q[*state][selected_action]) # TODO
+        Q[*state][selected_action] += alpha * (reward + gamma * Q[*next_state][next_action] - Q[*state][selected_action])
 
         # Update state and action for next loop
         state = next_state
