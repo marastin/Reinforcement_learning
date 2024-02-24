@@ -1,6 +1,8 @@
 import numpy as np
 from tabulate import tabulate
-np.random.seed(31)
+import matplotlib.pyplot as plt
+
+np.random.seed(5)
 
 # Problem Parameters
 n_rows = 7
@@ -10,7 +12,7 @@ n_cols = 10
 states = np.zeros((n_rows, n_cols))
 
 # Define the start point and terminal state
-terminal_state = np.array((4, 7))
+terminal_state = np.array((3, 7))
 start_point = np.array((3, 0))
 
 
@@ -40,7 +42,6 @@ for row in range(n_rows):
         if col < n_cols - 1:
             transition.append(2) # Move Right (E)
         transitions[row, col] = transition
-print(tabulate(transitions, tablefmt='fancy_grid'))
 
 # Define transition duo to the wind
 wind = np.empty((n_rows, n_cols, 2))
@@ -54,7 +55,7 @@ for row in range(n_rows):
             wind[row, col, :] = np.array((0, 0))
 
 # Define the number of episodes
-num_episodes = 50
+num_episodes = 500
 time_elapsed_in_episode = np.zeros((num_episodes, 1), dtype=int)
 
 # Initialize state-action values
@@ -69,10 +70,14 @@ alpha = 0.5
 # Define the epsilon for epsilon-greedy policy
 epsilon = 0.1
 
+# Track the relation between time step and episodes
+
+
 # Perform Temporal Difference updates
 for episode in range(num_episodes):
-    t = 0
 
+    t = 0
+    
     # Start from the start point
     state = start_point
 
@@ -103,7 +108,7 @@ for episode in range(num_episodes):
 
         if np.random.rand() > epsilon:
             # Select the greedy action
-            next_action = transitions[*state][np.argmax(Q[*state][transitions[*state]])]
+            next_action = transitions[*next_state][np.argmax(Q[*next_state][transitions[*next_state]])]
 
         else:
             # Select a random action from valid transition
@@ -121,9 +126,6 @@ for episode in range(num_episodes):
     
     # Record the number of step
     time_elapsed_in_episode[episode] = t
-
-    if (episode + 1) % 100 == 0:
-        print(f"episode {episode + 1}: T = {t}")
 
 # Draw a table to visualize the greedy action based on the argmax of Q
 greedy_actions = np.empty((n_rows, n_cols), dtype=object)
@@ -164,7 +166,7 @@ while True:
     reward = rewards
 
     # Select the greedy action
-    next_action = transitions[*state][np.argmax(Q[*state][transitions[*state]])]
+    next_action = transitions[*next_state][np.argmax(Q[*next_state][transitions[*next_state]])]
 
     # Update state and action for next loop
     state = next_state
@@ -172,7 +174,17 @@ while True:
 
     t += 1
     greedy_actions_steps[*state] = t
+    
+    # To prevent infinite loop
     if t > 100:
         break
 
+# Show the path according to greedy action
 print(tabulate(greedy_actions_steps, tablefmt='fancy_grid'))
+
+# plot the path length per episode
+plt.plot(-time_elapsed_in_episode)
+plt.grid(True)
+plt.xlabel('Episode')
+plt.ylabel('Total reward')
+plt.show()
