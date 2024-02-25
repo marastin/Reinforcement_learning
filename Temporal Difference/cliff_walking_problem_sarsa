@@ -121,7 +121,7 @@ for episode in range(num_episodes):
 
         else:
             # Select a random action from valid transition
-            next_action = np.random.choice(list(transitions[*state]))
+            next_action = np.random.choice(list(transitions[*next_state]))
 
                 
         # Update action-state value
