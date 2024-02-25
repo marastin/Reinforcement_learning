@@ -1,6 +1,6 @@
 """
 This code implements the 'Expected SARSA' algorithm to solve the cliff walking problem.
-Expected SARSA is an on-policy temporal-difference reinforcement learning algorithm that learns the optimal policy.
+Expected SARSA is an off-policy temporal-difference reinforcement learning algorithm.
 
 The grid world consists of a specified number of rows and columns, with a start point, cliffs and a terminal state.
 
