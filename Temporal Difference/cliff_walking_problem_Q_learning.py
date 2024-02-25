@@ -6,7 +6,7 @@ The grid world consists of a specified number of rows and columns, with a start 
 
 The agent can move in four directions (N, S, E, W).
 
-Upong going to the cliff zone the agent will move to the start point with large negative reward.
+Upon going to the cliff zone the agent will move to the start point with large negative reward.
 
 The goal is to learn the optimal policy that maximizes cumulative rewards while navigating from the start point to the terminal state.
 
