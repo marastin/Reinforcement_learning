@@ -82,9 +82,6 @@ alpha = 0.5
 # Define the epsilon for epsilon-greedy policy
 epsilon = 0.1
 
-# Track the relation between time step and episodes
-
-
 # Perform Temporal Difference updates
 for episode in range(num_episodes):
 
@@ -144,15 +141,18 @@ greedy_actions = np.empty((n_rows, n_cols), dtype=object)
 for row in range(n_rows):
     for col in range(n_cols):
         state = (row, col)
-        greedy_action = transitions[*state][np.argmax(Q[*state][transitions[*state]])]
-        if greedy_action == 0:
-            greedy_actions[row, col] = 'N'
-        elif greedy_action == 1:
-            greedy_actions[row, col] = 'S'
-        elif greedy_action == 2:
-            greedy_actions[row, col] = 'E'
-        elif greedy_action == 3:
-            greedy_actions[row, col] = 'W'
+        if all(state == terminal_state):
+            greedy_actions[row, col] = '■'
+        else:    
+            greedy_action = transitions[*state][np.argmax(Q[*state][transitions[*state]])]
+            if greedy_action == 0:
+                greedy_actions[row, col] = 'N'
+            elif greedy_action == 1:
+                greedy_actions[row, col] = 'S'
+            elif greedy_action == 2:
+                greedy_actions[row, col] = 'E'
+            elif greedy_action == 3:
+                greedy_actions[row, col] = 'W'
 
 print(tabulate(greedy_actions, tablefmt='fancy_grid'))
 
