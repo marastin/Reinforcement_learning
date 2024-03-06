@@ -1,3 +1,16 @@
+"""
+Description:
+This Python script implements the Q-learning algorithm to find an optimal policy for a grid world problem. 
+
+The grid world consists of a 2D grid where the agent navigates from a start point to a terminal point while
+avoiding obstacles.
+
+The agent can move in four directions (U, D, R, L).
+
+The Q-learning algorithm updates the Q-values for each state-action pair based on the agent's experience,
+gradually improving its policy.
+"""
+
 import numpy as np
 from tabulate import tabulate
 import matplotlib.pyplot as plt
