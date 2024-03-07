@@ -2,7 +2,7 @@ import numpy as np
 from TileCodingSoftware import IHT, tiles
 import matplotlib.pyplot as plt
 
-
+np.random.seed(5)
 
 actions = [-1, 0, 1]
 
@@ -111,6 +111,8 @@ for episode in range(n_episodes):
     
     print(episode, T)
     T_episodes[episode] = T
+
+print(f"The number of indices used in iht: {iht.count()}")
 
 plt.plot(T_episodes)
 plt.show()
