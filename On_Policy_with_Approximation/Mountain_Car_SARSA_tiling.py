@@ -14,7 +14,6 @@ V_MAX = 0.07
 epsilon = 0
 
 n_episodes = 500
-alpha = 0.1
 
 def get_next_state(x, v, action):
     next_v = v + 0.001 * action - 0.0025 * np.cos(3 * x)
@@ -32,6 +31,8 @@ iht=IHT(maxSize)
 W = np.zeros(maxSize)
 x_scale = numOfTilings / (X_MAX - X_MIN)
 v_scale = numOfTilings / (V_MAX - V_MIN)
+
+alpha = 1 / numOfTilings
 
 def get_eps_greedy_action(x,v):
     if np.random.binomial(1, epsilon) == 1:
