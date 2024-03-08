@@ -1,5 +1,6 @@
 from ValueFunction import ValueFunctionTiling
 import numpy as np
+from tabulate import tabulate
 
 np.random.seed(5)
 
@@ -42,7 +43,7 @@ def take_action(state, action):
     return next_server_state, next_priority, reward
     
         
-n_episodes = 20000
+n_episodes = 200000 # It may set to 2000000
 
 q = ValueFunctionTiling(8, alpha=alpha)
 r_av = 0
@@ -50,7 +51,7 @@ r_av = 0
 state = (np.random.choice(server_states), np.random.choice(priorities))
 action = eps_greedy_action(q, *state)
 
-for i in range(n_episodes):
+for episode in range(n_episodes):
     next_server_state, next_priority, reward = take_action(state, action)
     next_action = eps_greedy_action(q, next_server_state, next_priority)
     delta = reward - r_av + q.value([], (next_server_state, next_priority, next_action)) - q.value([], (*state, action))
@@ -58,5 +59,18 @@ for i in range(n_episodes):
     q.update(delta, [], (*state, action))
     state = (next_server_state, next_priority)
     action = next_action
-print(r_av)
+    if (episode + 1) % 1000 == 0:
+        print(f"Episode: {episode+1} - Average reward: {r_av:.3f}")
+    
+
+print(f"Average reward: {r_av}")
+
+greedy_actions_table = np.empty((len(server_states), len(priorities)), dtype=int)
+for s in range(len(server_states)):
+    for p in range(len(priorities)):
+        greedy_actions_table[s,p] = greedy_action(q,s,p)
+
+print(tabulate(greedy_actions_table.T, tablefmt='fancy_grid'))
+
+
 
