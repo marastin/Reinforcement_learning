@@ -1,15 +1,16 @@
 import numpy as np
 
 class ValueFunction:
-    def __init__(self, shape) -> None:
+    def __init__(self, shape, alpha=None) -> None:
         self.value = np.zeros(shape)
-        self.dim = len(shape)
+        self.dim = len(shape)        
+        self.alpha = 0.1 if alpha is None else alpha
 
     def __getitem__(self, state):
         return self.value[state]
         
     def update(self, delta, state):
-        pass
+        self.value += delta * self.alpha
 
 
 class ValueFunctionPolynomial:
@@ -50,16 +51,27 @@ class ValueFunctionFourier:
     
 
 class ValueFunctionTiling:
-    def __init__(self, mem_size, n_tiling, alpha) -> None:
+    def __init__(self, n_tiling:int, alpha=0.1, mem_size=2048) -> None:
         self.iht = IHT(mem_size)
         self.n_tiling = n_tiling
         self.alpha = alpha / float(n_tiling) # step size
         self.weights = np.zeros(mem_size)
+        self.scales = None
+    
+    def define_scales(self, floats_min, floats_max):
+        self.scales = [self.n_tiling / (floats_max[i] - floats_min[i]) for i in range(len(floats_max))]
 
-    def value(self, state):
-        pass
-
-
+    def value(self, state_floats, state_ints):
+        if self.scales is not None:
+            state_floats = np.multiply(self.scales, state_floats)
+        active_tiles = tiles(self.iht, self.n_tiling, state_floats, state_ints)
+        return np.sum(self.weights[active_tiles])
+    
+    def update(self, delta, state_floats, state_ints):
+        active_tiles = tiles(self.iht, self.n_tiling, state_floats, state_ints)
+        for tile in active_tiles:
+            self.weights[tile] += self.alpha * delta   
+        
 
 
 
