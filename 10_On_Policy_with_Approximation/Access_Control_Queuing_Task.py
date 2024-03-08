@@ -42,7 +42,7 @@ def take_action(state, action):
     return next_server_state, next_priority, reward
     
         
-n_episodes = 100000
+n_episodes = 20000
 
 q = ValueFunctionTiling(8, alpha=alpha)
 r_av = 0
@@ -59,3 +59,4 @@ for i in range(n_episodes):
     state = (next_server_state, next_priority)
     action = next_action
 print(r_av)
+

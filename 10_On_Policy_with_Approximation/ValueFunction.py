@@ -1,3 +1,5 @@
+import numpy as np
+
 class ValueFunctionTiling:
     def __init__(self, n_tiling:int, alpha=0.1, mem_size=2048) -> None:
         self.iht = IHT(mem_size)
