@@ -1,14 +1,15 @@
+import os
 import random
 from collections import namedtuple
 
 import numpy as np
+import matplotlib.pyplot as plt
 import gymnasium as gym
 import torch as T
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-import matplotlib.pyplot as plt
 
 
 Transition = namedtuple('Transition', ['state', 'action', 'reward', 'next_state', 'terminated', 'truncated'])
@@ -36,9 +37,9 @@ class QNetwork(nn.Module):
                  input_dim,
                  output_dim,
                  hidden_dims=(32,32),
-                 activation_fc = F.relu):
+                 activation_fc = F.relu,):
         super().__init__()
-        
+
         self.activation_fc = activation_fc
         
         self.input_layer = nn.Linear(input_dim, hidden_dims[0])
@@ -63,6 +64,14 @@ class QNetwork(nn.Module):
         x = self.output_layer(x)
         
         return x
+    
+    def save_checkpoint(self, checkpoint_dir=None, checkpoint_file='q_network_nfq'):
+        if checkpoint_dir is None:
+            checkpoint_dir = os.path.dirname(os.path.abspath(__file__))
+        T.save(self.state_dict(), os.path.join(checkpoint_dir, checkpoint_file))
+
+    def load_checkpoint(self, checkpoint_dir, checkpoint_file):
+        self.load_state_dict(T.load(os.path.join(checkpoint_dir, checkpoint_file)))
 
 def evaluation(env, q_network):
     state, info = env.reset()
@@ -82,7 +91,7 @@ def evaluation(env, q_network):
 
 
 if __name__ == "__main__":
-    n_episodes = 300
+    n_episodes = 100
     batch_size = 32
     gamma = 0.99
     epsilon = 0.5
@@ -151,14 +160,23 @@ if __name__ == "__main__":
         
         if episode % evaluation_period == 0:
             evaluation_result = evaluation(env, q_network)
-            print(f"--- Evakuation: Episode {episode}: Total Reward: {evaluation_result}")
+            print(f"--- Evaluation: Episode {episode}: Total Reward: {evaluation_result}")
             evaluation_results.append(evaluation_result)
         
         print(f"Episode {episode}: Total Reward: {total_reward}")
+    
+    # If You want to save or load a checkpoint as below (uncommet it)
+    
+    # checkpoint_dir = os.path.dirname(os.path.abspath(__file__))
+    # checkpoint_file='q_network_nfq'
+    # q_network.save_checkpoint(checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file)
 
-x = np.arange(0, len(evaluation_results)*evaluation_period, evaluation_period)
-plt.plot(x, evaluation_results)
-plt.title("Evaluation Results")
-plt.xlabel("number of episode")
-plt.ylabel("score")
-plt.show()
+    # q_network_tmp = QNetwork(n_states, n_actions)
+    # q_network_tmp.load_checkpoint(checkpoint_dir, checkpoint_file)
+
+    x = np.arange(1, len(evaluation_results)*evaluation_period + 1, evaluation_period)
+    plt.plot(x, evaluation_results)
+    plt.title("Evaluation Results")
+    plt.xlabel("number of episode")
+    plt.ylabel("score")
+    plt.show()
