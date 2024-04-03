@@ -11,9 +11,6 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 
 
-# SEED = 543
-# T.manual_seed(seed=SEED)
-
 Transition = namedtuple('Transition', ['state', 'action', 'reward', 'next_state', 'terminated', 'truncated'])
 
 class ReplayBuffer:
@@ -96,9 +93,8 @@ if __name__ == "__main__":
     env = gym.make('CartPole-v1')
     n_states = env.observation_space.shape[0]
     n_actions = env.action_space.n
+
     q_network = QNetwork(n_states, n_actions)
-    # q_network_target = QNetwork(n_states, n_actions)
-    # q_network_target.load_state_dict(q_network.state_dict())
     optimizer = optim.RMSprop(q_network.parameters(), lr = 0.0005)
     buffer = ReplayBuffer(capacity=2000)
 
@@ -154,12 +150,15 @@ if __name__ == "__main__":
                 break
         
         if episode % evaluation_period == 0:
-            r = evaluation(env, q_network)
-            print(f"--- Evakuation: Episode {episode}: Total Reward: {r}")
-            evaluation_results.append(r)
+            evaluation_result = evaluation(env, q_network)
+            print(f"--- Evakuation: Episode {episode}: Total Reward: {evaluation_result}")
+            evaluation_results.append(evaluation_result)
         
         print(f"Episode {episode}: Total Reward: {total_reward}")
 
-
-plt.plot(evaluation_results)
+x = np.arange(0, len(evaluation_results)*evaluation_period, evaluation_period)
+plt.plot(x, evaluation_results)
+plt.title("Evaluation Results")
+plt.xlabel("number of episode")
+plt.ylabel("score")
 plt.show()
