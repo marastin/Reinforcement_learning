@@ -4,7 +4,7 @@ from collections import namedtuple
 
 import numpy as np
 import matplotlib.pyplot as plt
-import gymnasium as gym
+import gymnasium as gym                 # pip install gymnasium[classic-control]
 import torch as T
 import torch.nn as nn
 import torch.nn.functional as F
@@ -112,6 +112,7 @@ if __name__ == "__main__":
     # Hyperparameters
     n_episodes = 300
     batch_size = 32
+    buffer_capacity = 2000
     gamma = 0.99
     epsilon = 0.5
     evaluation_period = 2
@@ -126,7 +127,7 @@ if __name__ == "__main__":
     # Initialize Q-network and optimizer
     q_network = QNetwork(n_states, n_actions)
     optimizer = optim.RMSprop(q_network.parameters(), lr = 0.0005)
-    buffer = ReplayBuffer(capacity=2000)
+    buffer = ReplayBuffer(capacity=buffer_capacity)
 
     # Main training loop
     for episode in range(n_episodes):
