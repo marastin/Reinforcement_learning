@@ -113,6 +113,7 @@ if __name__ == "__main__":
     n_episodes = 200
     n_epoches = 10
     batch_size = 32
+    buffer_capacity = 2000
     gamma = 0.99
     epsilon = 0.5
     evaluation_period = 2
@@ -128,7 +129,7 @@ if __name__ == "__main__":
     # Initialize Q-network and optimizer
     q_network = QNetwork(n_states, n_actions)
     optimizer = optim.RMSprop(q_network.parameters(), lr = 0.0005)
-    buffer = ReplayBuffer(capacity=2000)
+    buffer = ReplayBuffer(capacity=buffer_capacity)
 
     # Main training loop
     for episode in range(n_episodes):
