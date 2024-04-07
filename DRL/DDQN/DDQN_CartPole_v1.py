@@ -194,7 +194,8 @@ if __name__ == "__main__":
                 b_q_value_target = b_reward + (1 - b_terminated) * gamma * b_max_next_q_value
                 
                 # Compute loss and update network
-                loss = F.mse_loss(b_q_value_online, b_q_value_target)
+                # loss = F.mse_loss(b_q_value_online, b_q_value_target)
+                loss = F.huber_loss(b_q_value_online, b_q_value_target)
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
