@@ -4,7 +4,7 @@ from collections import namedtuple
 
 import numpy as np
 import matplotlib.pyplot as plt
-import gymnasium as gym
+import gymnasium as gym # https://pypi.org/project/gymnasium/
 import torch as T
 import torch.nn as nn
 import torch.nn.functional as F
@@ -110,16 +110,17 @@ def evaluation(env, q_network):
 if __name__ == "__main__":
 
     # Hyperparameters
-    n_episodes = 200
+    n_episodes = 500
     batch_size = 64
     hidden_layers = (512, 128)
     buffer_capacity = 50000
     target_network_update_rate = 10
+    evaluation_goal = 475 # must be <= 500
     gamma = 1
     epsilon_init = 1
     epsilon_decay_steps = 5000
     epsilon_min = 0.1
-    evaluation_rate = 2
+    evaluation_rate = 1
     episode_max_length = 1000
     evaluation_results = []
 
@@ -187,15 +188,14 @@ if __name__ == "__main__":
                 b_next_action_online = T.argmax(b_next_q_values_online, dim=1, keepdim=True)
 
                 # Compute Q-values for next state-action pairs using target network
-                b_next_q_values_target = q_network_target(b_next_state)
+                b_next_q_values_target = q_network_target(b_next_state).detach()
                 b_max_next_q_value = b_next_q_values_target.gather(1, b_next_action_online)
 
                 # Compute target values
                 b_q_value_target = b_reward + (1 - b_terminated) * gamma * b_max_next_q_value
                 
                 # Compute loss and update network
-                # loss = F.mse_loss(b_q_value_online, b_q_value_target)
-                loss = F.huber_loss(b_q_value_online, b_q_value_target)
+                loss = F.mse_loss(b_q_value_online, b_q_value_target)
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
@@ -209,7 +209,7 @@ if __name__ == "__main__":
                     #     target.data.copy_(online.data)
             
             if terminated or truncated:
-                print(f"Episode {episode} | Total Reward: {total_reward} | Eps: {epsilon:.4f} | t: {t}")
+                print(f"Ep {episode:4.0f} | TR: {total_reward:4.0f} | ε: {epsilon:.4f} | t: {t}")
                 break
         
         
@@ -220,16 +220,20 @@ if __name__ == "__main__":
         # Perform evaluation periodically
         if episode % evaluation_rate == 0:
             evaluation_result = evaluation(env, q_network_online)
-            print(f"--- Evaluation: Episode {episode}: Total Reward: {evaluation_result}")
+            print(f"------------ Evaluation: Episode {episode}: Total Reward: {evaluation_result}")
             evaluation_results.append(evaluation_result)
         
-    
-    # If You want to save or load a checkpoint as below (uncommet it)
-    
-    # checkpoint_dir = os.path.dirname(os.path.abspath(__file__))
-    # checkpoint_file='q_network_dqn'
-    # q_network.save_checkpoint(checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file)
-
+        if np.mean(evaluation_results[-10:]) > evaluation_goal:
+            print(f"Evaluation goal achieved at episode {episode}")
+            # If You want to save a checkpoint (uncomment below)
+            # checkpoint_dir = os.path.dirname(os.path.abspath(__file__))
+            # checkpoint_file='q_network_ddqn'
+            # q_network_online.save_checkpoint(checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file)
+            break
+            
+        
+   
+    # If You want to load a checkpoint (uncomment below)
     # q_network_tmp = QNetwork(n_states, n_actions)
     # q_network_tmp.load_checkpoint(checkpoint_dir, checkpoint_file)
 
