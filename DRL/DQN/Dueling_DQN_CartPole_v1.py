@@ -4,7 +4,7 @@ from collections import namedtuple
 
 import numpy as np
 import matplotlib.pyplot as plt
-import gymnasium as gym
+import gymnasium as gym # https://pypi.org/project/gymnasium/
 import torch as T
 import torch.nn as nn
 import torch.nn.functional as F
@@ -120,6 +120,7 @@ if __name__ == "__main__":
     hidden_layers = (512, 128)
     buffer_capacity = 50000
     target_network_update_rate = 10
+    evaluation_goal = 475 # must be <= 500
     gamma = 1
     epsilon_init = 1
     epsilon_decay_steps = 5000
@@ -221,6 +222,14 @@ if __name__ == "__main__":
             evaluation_result = evaluation(env, q_network_online)
             print(f"------------ Evaluation: Episode {episode}: Total Reward: {evaluation_result}")
             evaluation_results.append(evaluation_result)
+        
+        if np.mean(evaluation_results[-10:]) > evaluation_goal:
+            print(f"Evaluation goal achieved at episode {episode}")
+            # If You want to save a checkpoint (uncomment below)
+            # checkpoint_dir = os.path.dirname(os.path.abspath(__file__))
+            # checkpoint_file='q_network_ddqn'
+            # q_network_online.save_checkpoint(checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file)
+            break
         
     
     # If You want to save or load a checkpoint as below (uncommet it)
