@@ -4,7 +4,7 @@ from collections import namedtuple
 
 import numpy as np
 import matplotlib.pyplot as plt
-import gymnasium as gym
+import gymnasium as gym # https://pypi.org/project/gymnasium/
 import torch as T
 import torch.nn as nn
 import torch.nn.functional as F
