@@ -245,7 +245,7 @@ if __name__ == "__main__":
     # Plot evaluation results
     x = np.arange(1, len(evaluation_results)*evaluation_rate + 1, evaluation_rate)
     plt.plot(x, evaluation_results)
-    plt.title("Evaluation Results - DQN Method")
+    plt.title("Evaluation Results - Dueling DQN Method")
     plt.xlabel("number of episode")
     plt.ylabel("score")
     plt.show()
