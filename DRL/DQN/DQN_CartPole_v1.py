@@ -38,12 +38,14 @@ if __name__ == "__main__":
     hidden_layers = (512, 128)
     buffer_capacity = 50000
     target_network_update_rate = 10
+    evaluation_goal = 475 # must be <= 500
     gamma = 1
     epsilon_init = 1
     epsilon_decay_steps = 5000
     epsilon_min = 0.1
     evaluation_rate = 2
     episode_max_length = 1000
+    
     evaluation_results = []
 
     
@@ -137,15 +139,18 @@ if __name__ == "__main__":
         # Perform evaluation periodically
         if episode % evaluation_rate == 0:
             evaluation_result = evaluation(env, q_network_online)
-            print(f"--- Evaluation: Episode {episode}: Total Reward: {evaluation_result}")
+            print(f"------------ Evaluation: Episode {episode}: Total Reward: {evaluation_result}")
             evaluation_results.append(evaluation_result)
         
+        if np.mean(evaluation_results[-10:]) > evaluation_goal:
+            print(f"Evaluation goal achieved at episode {episode}")
+            # If You want to save a checkpoint (uncomment below)
+            # checkpoint_dir = os.path.dirname(os.path.abspath(__file__))
+            # checkpoint_file='q_network_ddqn'
+            # q_network_online.save_checkpoint(checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file)
+            break
+        
     
-    # If You want to save or load a checkpoint as below (uncommet it)
-    
-    # checkpoint_dir = os.path.dirname(os.path.abspath(__file__))
-    # checkpoint_file='q_network_dqn'
-    # q_network.save_checkpoint(checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file)
 
     # q_network_tmp = QNetwork(n_states, n_actions)
     # q_network_tmp.load_checkpoint(checkpoint_dir, checkpoint_file)

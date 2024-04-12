@@ -47,6 +47,7 @@ if __name__ == "__main__":
     epsilon_min = 0.1
     evaluation_rate = 2
     episode_max_length = 1000
+    
     evaluation_results = []
 
     
@@ -152,11 +153,6 @@ if __name__ == "__main__":
             break
         
     
-    # If You want to save or load a checkpoint as below (uncommet it)
-    
-    # checkpoint_dir = os.path.dirname(os.path.abspath(__file__))
-    # checkpoint_file='q_network_dqn'
-    # q_network.save_checkpoint(checkpoint_dir=checkpoint_dir, checkpoint_file=checkpoint_file)
 
     # q_network_tmp = QNetwork(n_states, n_actions)
     # q_network_tmp.load_checkpoint(checkpoint_dir, checkpoint_file)
