@@ -12,24 +12,7 @@ import torch.optim as optim
 
 from buffer import ReplayBuffer
 from networks import DuelingQNetwork
-
-
-def evaluation(env, q_network):
-    """Evaluate the agent's performance under greedy policy"""
-    state, info = env.reset()
-    total_reward = 0
-    
-    for _ in range(episode_max_length):
-        with T.no_grad():
-            q_values = q_network(T.tensor(state, dtype=T.float32).to(q_network.device))
-            action = q_values.argmax().item()
-        
-        next_state, reward, terminated, truncated, info = env.step(action)
-        total_reward += reward
-        state = next_state
-        if terminated or truncated:
-            break
-    return total_reward
+from utils import evaluation
 
 
 if __name__ == "__main__":
